@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>fastready.js Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="fastready.js"></script>
+    <script>
+        // This selector hits all images in the page
+        var $images = fastready('img');
+        $images.on('addedNodes', (element) => {
+            console.log('generic', element);
+        });
+        // Filter only those who have the 'test1' class
+        $images.on('addedNodes', '&.test1', (element) => {
+            console.log('.test1', element);
+        })
+        // FIlter only those who have both 'test1' and 'test2' classes
+        $images.on('addedNodes', '&.test1.test2', (element) => {
+            console.log('.test1.test2', element);
+        })
+
+        // This selector hits any div with the 'sub' class
+        var $sub = fastready('div.sub');
+        $sub.on('addedNodes', (element) => {
+            console.log('sub', 'generic', element);
+        });
+        // Filter only images inside divs with the 'sub' class
+        $sub.on('addedNodes', 'img', (element) => {
+            console.log('sub', 'img', element);
+        });
+    </script>
+</head>
+<body>
+    <img src="//placehold.it/300x200" />
+    <img src="//placehold.it/300x400" />
+    <img src="//placehold.it/300x500" />
+    <img src="//placehold.it/300x600" />
+    <div class="sub">
+        <img src="//placehold.it/300x700" />
+        <img src="//placehold.it/300x800" />
+        <img src="//placehold.it/300x900" class="test1" />
+        <img src="//placehold.it/300x100" class="test1 test2" />
+    </div>
+</body>
+</html>
