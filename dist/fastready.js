@@ -1,5 +1,5 @@
 /**
- * fastready.js
+ * fastready.js v0.0.0-dev
  * A MutationObserver-based alternative to document.ready and window.load that streams element load events in real-time
  */
 
@@ -41,11 +41,11 @@ window.fastready = function fastready (element, queryString) {
                                 // If array, loop through it
                                 for (var iSubMutation = 0, submutation; submutation = mutationEvent[iSubMutation++];) {
                                     // Test if we are dealing with a tag, if so test it against the selector
-                                    if (submutation.tagName && $this.isMatchingElement(submutation, event.fullSelector)) {
+                                    if (submutation.tagName && $this.isMatchingElement(submutation, event.fullSelector) && event.callback) {
                                         event.callback.call(mutationEvent, submutation, event);
                                     }
                                 }
-                            } else {
+                            } else if (event.callback) {
                                 // If not array, just return the result
                                 event.callback.call(mutationEvent, null, event);
                             }
@@ -106,17 +106,28 @@ window.fastready = function fastready (element, queryString) {
 
         // Generate events array and apply shortcuts
         var events = $this.applyShortcuts(event);
-        
-        // Add to our mutation events
-        $this._observerCallbackList.push({
+
+        // Create our event object
+        var eventObject = {
             id: id,
             events: events,
             selector: selector,
             fullSelector: fullSelector,
             callback: callback
-        });
+        };
+        
+        // Add to our mutation events
+        $this._observerCallbackList.push(eventObject);
 
         // Run a check for any element already on page matching it
+        if ($this.isMatchingEvent(events, [$this.shortcutSymbol + 'ready'])) {
+            var matches = document.querySelectorAll(fullSelector);
+
+            for (var iMatch = 0, match; match = matches[iMatch++];) {
+                if (callback)
+                    callback.call(null, match, eventObject);
+            }
+        }
 
         return id;
     }
